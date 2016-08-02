@@ -43,8 +43,8 @@ Known to be missing (probably incomplete):
 ## Usage
 
 ```
-git clone https://github.com/arangodb/arangodb-mini-dcos.git
-cd arangodb-mini-dcos
+git clone https://github.com/arangodb/dcos-mini-cluster.git
+cd dcos-mini-cluster
 ./start-cluster.sh
 
 Usage: ./start-cluster.sh <mesos-cluster-workdir> [--num-slaves=<num-slaves>] [--port-range=<port-range>] [<additional-docker-options>]
