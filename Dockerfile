@@ -35,4 +35,4 @@ RUN cp /etc/nginx/mime.types /etc/nginx/conf/mime.types
 
 COPY container/supervisor /etc/supervisor
 
-ENTRYPOINT ["/docs-cluster.sh"]
+ENTRYPOINT ["/dcos-cluster.sh"]
