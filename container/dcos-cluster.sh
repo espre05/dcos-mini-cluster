@@ -42,7 +42,7 @@ for var in "\$@"; do
   fi
 done
 
-if [ "\$HOSTNET" = "0" ] && [ "\$1" = "-H" ] && [ "\$3" = "run" ]; then
+if [ "\$1" = "-H" ] && [ "\$3" = "run" ]; then
   DOCKER_ENDPOINT=\$2
   
   shift

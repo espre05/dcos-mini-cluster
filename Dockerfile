@@ -14,12 +14,16 @@ mkdir -p /etc/supervisor/conf.d
 
 RUN mkdir -p /usr/lib/jvm/java-9-openjdk-amd64/conf/management/ && touch /usr/lib/jvm/java-9-openjdk-amd64/conf/management/management.properties
     
-RUN echo "deb http://repos.mesosphere.io/ubuntu vivid main" > /etc/apt/sources.list.d/mesosphere.list && \
+RUN echo "deb http://repos.mesosphere.io/ubuntu xenial main" > /etc/apt/sources.list.d/mesosphere.list && \
     apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF && \
     apt-get update && \
-    apt-get -y install mesos marathon
+    apt-get -y install marathon mesos
 
-RUN curl -so /usr/bin/docker https://get.docker.com/builds/Linux/x86_64/docker-1.10.3 && chmod +x /usr/bin/docker
+RUN curl -so /tmp/docker-1.12.1.tar.gz https://experimental.docker.com/builds/Linux/x86_64/docker-1.12.1.tgz && \
+  cd /tmp && \
+  tar xvzf docker-1.12.1.tar.gz && \
+  mv docker/docker /usr/bin/docker && \
+  rm -rf docker
 
 ADD ./container/distribute-slave-resources /distribute-slave-resources
 ADD ./container/dcos-cluster.sh /dcos-cluster.sh
