@@ -1,3 +1,3 @@
-project (distribute-slave-resources)
-set(CMAKE_EXE_LINKER_FLAGS "-static")
-add_executable(container/distribute-slave-resources distribute-slave-resources.cpp)
+project (distribute-slave-resources CXX)
+cmake_minimum_required(VERSION 3.0)
+add_executable(distribute-slave-resources distribute-slave-resources.cpp)

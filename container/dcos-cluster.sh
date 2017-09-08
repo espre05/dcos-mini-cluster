@@ -72,7 +72,11 @@ cat << EOF >/etc/supervisor/conf.d/marathon.conf
 command=marathon --master zk://$IP:2181/mesos --zk zk://$IP:2181/marathon --logging_level warn
 EOF
 
-SLAVE_RESOURCES=$(/distribute-slave-resources $1 $CLUSTER_BASE_DIR/$HOSTNAME)
+
+ls -al /
+/distribute-slave-resources $1 $CLUSTER_BASE_DIR/$HOSTNAME > /tmp/base_resources.json
+cat /tmp/base_resources.json
+cat /tmp/base_resources.json | jq .
 
 let slave_start_port=${PORT_RANGE%:*}
 let slave_end_port=${PORT_RANGE#*:}
@@ -86,9 +90,16 @@ for i in `seq $NUM_SLAVES`; do
 
   iptables -t nat -A PREROUTING -p tcp -d $IP --dport $slave_resource_start_port:$slave_resource_end_port -j DNAT --to-destination $HOSTIP
   iptables -t nat -A OUTPUT -p tcp -d $IP --dport $slave_resource_start_port:$slave_resource_end_port -j DNAT --to-destination $HOSTIP
+  
+  mkdir -p /mount-slave-$i
+  mkdir -p /disk-slave-$i
+  mount --bind /disk-slave-$i /mount-slave-$i
+  # end seems to be a reserved keyword :D
+  cat /tmp/base_resources.json | jq --arg path /mount-slave-$i --argjson start $slave_resource_start_port --argjson ende $slave_resource_end_port '.+=[{"name": "ports", "type": "RANGES", "ranges": {"range": [{"begin": $start,"end": $ende}]}},{"name" : "disk", "type" : "SCALAR", "role": "*", "scalar" : { "value" : 4096 }, "disk" : {"source" : {"type" : "MOUNT", "mount" : { "root" : $path }}}}]' > /tmp/slave-resources-$i.json
+  cat /tmp/slave-resources-$i.json
   cat << EOF >/etc/supervisor/conf.d/mesos-slave-"$i".conf
 [program:mesos-slave-$i]
-command=mesos-slave --no-hostname_lookup --master=zk://$IP:2181/mesos --containerizers=docker --port=$slave_start_port --work_dir=$SLAVE_DIR --no-systemd_enable_support --resources="$SLAVE_RESOURCES";ports(*):[$slave_resource_start_port-$slave_resource_end_port]
+command=mesos-slave --no-hostname_lookup --master=zk://$IP:2181/mesos --containerizers=docker --port=$slave_start_port --work_dir=$SLAVE_DIR --no-systemd_enable_support --resources=file:///tmp/slave-resources-$i.json
 EOF
   let slave_start_port=slave_start_port+num_ports
 done

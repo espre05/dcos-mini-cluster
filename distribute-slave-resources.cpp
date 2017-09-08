@@ -66,5 +66,13 @@ int main(int argc, char** argv) {
     return -3;
   }
 
-  cout << fixed << setprecision(2) << "cpus:" << (float)cpus/(float)num_slaves << ";mem:" << memory/num_slaves << ";disk:" << diskfree/num_slaves << endl;
+  cout << fixed << setprecision(2)
+    << "["
+    << "{\"name\":\"cpus\",\"type\":\"SCALAR\",\"scalar\":{\"value\":" << (float)cpus/(float)num_slaves << "}}"
+    << ","
+    << "{\"name\":\"mem\",\"type\":\"SCALAR\",\"scalar\":{\"value\":" << memory/num_slaves << "}}"
+    << ","
+    << "{\"name\":\"disk\",\"type\":\"SCALAR\",\"scalar\":{\"value\":" << diskfree/num_slaves << "}}"
+    << "]"
+    << endl;
 }
